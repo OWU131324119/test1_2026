@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
-import plotly.express as px
 import os
 
 CSV_FILE = "sleep_log.csv"
@@ -12,7 +11,7 @@ st.set_page_config(
     layout="centered"
 )
 
-st.title("睡眠記録アプリ")
+st.title("🌙睡眠記録アプリ")
 
 # CSV作成
 if not os.path.exists(CSV_FILE):
@@ -103,39 +102,18 @@ if not df.empty:
 
     st.subheader("📈 睡眠時間の推移")
 
-# グラフ用の日付表示（06/09 の形式）
-df["date_str"] = df["date"].dt.strftime("%m/%d")
+    # グラフ用の日付表示
+    df["date_str"] = df["date"].dt.strftime("%m/%d")
 
-fig = px.bar(
-    df,
-    x="date_str",
-    y="sleep_hours",
-    labels={
-        "date_str": "日付",
-        "sleep_hours": "睡眠時間（時間）"
-    }
-)
+    chart_df = df[["date_str", "sleep_hours"]]
+    chart_df = chart_df.set_index("date_str")
 
-fig.update_layout(
-    width=700,
-    height=400,
-    margin=dict(l=20, r=20, t=30, b=20)
-)
+    st.bar_chart(
+        chart_df,
+        use_container_width=True
+    )
 
-fig.update_yaxes(
-    range=[0, 12],
-    title="睡眠時間（時間）"
-)
-
-fig.update_xaxes(
-    title="日付"
-)
-
-st.plotly_chart(fig)
-
-st.divider()
-
-if not df.empty:
+    st.divider()
 
     st.subheader("📋 記録一覧")
 
